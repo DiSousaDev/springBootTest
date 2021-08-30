@@ -1,4 +1,4 @@
-package br.com.diego.springboottest.springboottest;
+package br.com.diego.springboottest;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

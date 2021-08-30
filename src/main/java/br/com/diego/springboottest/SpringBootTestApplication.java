@@ -1,4 +1,4 @@
-package br.com.diego.springboottest.springboottest;
+package br.com.diego.springboottest;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
