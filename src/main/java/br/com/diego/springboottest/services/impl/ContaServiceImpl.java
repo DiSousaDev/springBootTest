@@ -37,8 +37,8 @@ public class ContaServiceImpl implements ContaService {
     }
 
     @Override
-    public void efetuarTransferencia(Long numContaOrigem, Long numContaDestino, BigDecimal valor) {
-       Banco banco = bancoRepository.findById(1L);
+    public void efetuarTransferencia(Long numContaOrigem, Long numContaDestino, BigDecimal valor, Long bancoId) {
+       Banco banco = bancoRepository.findById(bancoId);
        int totalTransferencias = banco.getTotalTransferencias();
        banco.setTotalTransferencias(++totalTransferencias);
        bancoRepository.update(banco);
