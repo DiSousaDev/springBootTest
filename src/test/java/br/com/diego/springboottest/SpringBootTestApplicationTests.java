@@ -1,5 +1,7 @@
 package br.com.diego.springboottest;
 
+import br.com.diego.springboottest.models.Banco;
+import br.com.diego.springboottest.models.Conta;
 import br.com.diego.springboottest.repositories.BancoRepository;
 import br.com.diego.springboottest.repositories.ContaRepository;
 import br.com.diego.springboottest.services.ContaService;
@@ -47,6 +49,16 @@ class SpringBootTestApplicationTests {
 
         assertEquals("900", saldoOrigem.toPlainString());
         assertEquals("2100", saldoDestino.toPlainString());
+
+        int total = service.consultarTotalTransferencia(1L);
+        assertEquals(1, total);
+
+        verify(contaRepository, times(3)).findById(1L);
+        verify(contaRepository, times(3)).findById(2L);
+        verify(contaRepository, times(2)).update(any(Conta.class));
+
+        verify(bancoRepository, times(2)).findById(1L);
+        verify(bancoRepository).update(any(Banco.class));
 
     }
 
