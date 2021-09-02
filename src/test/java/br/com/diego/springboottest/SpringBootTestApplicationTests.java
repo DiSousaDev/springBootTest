@@ -9,6 +9,8 @@ import br.com.diego.springboottest.services.ContaService;
 import br.com.diego.springboottest.services.impl.ContaServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
@@ -20,16 +22,20 @@ import static org.mockito.Mockito.*;
 @SpringBootTest
 class SpringBootTestApplicationTests {
 
-    ContaRepository contaRepository;
-    BancoRepository bancoRepository;
-
+    @InjectMocks
     ContaService service;
+
+    @Mock
+    ContaRepository contaRepository;
+
+    @Mock
+    BancoRepository bancoRepository;
 
     @BeforeEach
     void setUp() {
-        contaRepository = mock(ContaRepository.class);
-        bancoRepository = mock(BancoRepository.class);
-        service = new ContaServiceImpl(contaRepository, bancoRepository);
+//        contaRepository = mock(ContaRepository.class);
+//        bancoRepository = mock(BancoRepository.class);
+//        service = new ContaServiceImpl(contaRepository, bancoRepository);
     }
 
     @Test
