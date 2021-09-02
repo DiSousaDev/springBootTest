@@ -23,7 +23,7 @@ import static org.mockito.Mockito.*;
 class SpringBootTestApplicationTests {
 
     @InjectMocks
-    ContaService service;
+    ContaServiceImpl service;
 
     @Mock
     ContaRepository contaRepository;
