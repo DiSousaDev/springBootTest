@@ -5,10 +5,11 @@ import br.com.diego.springboottest.models.Conta;
 import br.com.diego.springboottest.repositories.BancoRepository;
 import br.com.diego.springboottest.repositories.ContaRepository;
 import br.com.diego.springboottest.services.ContaService;
+import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.Optional;
 
+@Service
 public class ContaServiceImpl implements ContaService {
 
     private ContaRepository contaRepository;
