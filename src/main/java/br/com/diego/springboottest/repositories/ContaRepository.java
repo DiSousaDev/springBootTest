@@ -1,15 +1,12 @@
 package br.com.diego.springboottest.repositories;
 
 import br.com.diego.springboottest.models.Conta;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
+import java.util.Optional;
 
-public interface ContaRepository {
+public interface ContaRepository extends JpaRepository<Conta, Long> {
 
-    List<Conta> findAll();
-
-    Conta findById(Long id);
-
-    void update(Conta conta);
+    Optional<Conta> findByCliente(String cliente);
 
 }
