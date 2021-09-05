@@ -2,6 +2,7 @@ package br.com.diego.springboottest;
 
 import br.com.diego.springboottest.models.Banco;
 import br.com.diego.springboottest.models.Conta;
+import br.com.diego.springboottest.models.TransacaoDto;
 
 import java.math.BigDecimal;
 import java.util.Optional;
@@ -22,6 +23,15 @@ public class Dados {
 
     public static Optional<Banco> banco() {
         return Optional.of(new Banco(1L, "O Banco de Todos", 0));
+    }
+
+    public static TransacaoDto getTransacaoDtoMock() {
+        TransacaoDto dto = new TransacaoDto();
+        dto.setContaOrigemId(1L);
+        dto.setContaDestinoId(2L);
+        dto.setValor(new BigDecimal("100"));
+        dto.setBancoId(1L);
+        return dto;
     }
 
 }
