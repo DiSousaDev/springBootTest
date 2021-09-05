@@ -14,6 +14,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.mockito.Mockito.*;
@@ -56,6 +58,15 @@ class ContaControllerTest {
     void testTransferir() throws Exception{
         // Given
         TransacaoDto dto = getTransacaoDtoMock();
+        System.out.println(">>> Exibindo dto de entrada: " + objectMapper.writeValueAsString(dto));
+
+        Map<String, Object> responseBody = new HashMap<>();
+        responseBody.put("data", LocalDate.now().toString());
+        responseBody.put("status", "OK");
+        responseBody.put("mensagem", "Transferência realizada com sucesso!");
+        responseBody.put("transacao", dto);
+        System.out.println(">>> Exibindo mapper de retorno" + objectMapper.writeValueAsString(responseBody));
+
         // When
         mockMvc.perform(post("/api/contas/transferir")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -65,7 +76,8 @@ class ContaControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.data").value(LocalDate.now().toString()))
                 .andExpect(jsonPath("$.mensagem").value("Transferência realizada com sucesso!"))
-                .andExpect(jsonPath("$.transacao.contaOrigemId").value(dto.getContaOrigemId()));
+                .andExpect(jsonPath("$.transacao.contaOrigemId").value(dto.getContaOrigemId()))
+                .andExpect(content().json(objectMapper.writeValueAsString(responseBody)));
 
     }
 
