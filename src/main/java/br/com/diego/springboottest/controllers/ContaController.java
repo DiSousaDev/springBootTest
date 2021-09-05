@@ -37,7 +37,7 @@ public class ContaController {
     @PostMapping
     @ResponseStatus(CREATED)
     public Conta salvar(@RequestBody Conta conta) {
-        return null;
+        return contaService.salvar(conta);
     }
 
     @GetMapping("/{id}")

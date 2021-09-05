@@ -15,13 +15,14 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.mockito.Mockito.*;
 import static br.com.diego.springboottest.Dados.*;
@@ -103,8 +104,31 @@ class ContaControllerTest {
                 .andExpect(jsonPath("$[0].saldo").value("1000"))
                 .andExpect(jsonPath("$[1].saldo").value("2000"))
                 .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(content().json(objectMapper.writeValueAsString(contas)))
-        ;
+                .andExpect(content().json(objectMapper.writeValueAsString(contas)));
+        verify(contaService).buscarTodas();
 
+    }
+
+    @Test
+    void testSalvar() throws Exception {
+        // Given
+        Conta conta = new Conta(null, "João", new BigDecimal("3000"));
+        when(contaService.salvar(any())).then(invocation -> {
+            Conta c = invocation.getArgument(0);
+            c.setId(3L);
+            return c;
+        });
+
+        // When
+        mockMvc.perform(post("/api/contas")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(conta)))
+        // Then
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id", is(3)))
+                .andExpect(jsonPath("$.cliente", is("João")))
+                .andExpect(jsonPath("$.saldo", is(3000)));
+        verify(contaService).salvar(any());
     }
 }
