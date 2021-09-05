@@ -1,9 +1,11 @@
 package br.com.diego.springboottest.controllers;
 
+import br.com.diego.springboottest.models.Conta;
 import br.com.diego.springboottest.models.TransacaoDto;
 import br.com.diego.springboottest.services.ContaService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,9 +16,12 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.mockito.Mockito.*;
 import static br.com.diego.springboottest.Dados.*;
@@ -81,4 +86,25 @@ class ContaControllerTest {
 
     }
 
+    @Test
+    void testListarTodas() throws Exception{
+        // Given
+        List<Conta> contas = Arrays.asList(conta001().orElseThrow(), conta002().orElseThrow());
+        when(contaService.buscarTodas()).thenReturn(contas);
+
+        // When
+        mockMvc.perform(get("/api/contas")
+                .contentType(MediaType.APPLICATION_JSON))
+        // Then
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$[0].cliente").value("Carlos Silva"))
+                .andExpect(jsonPath("$[1].cliente").value("Maria Rita"))
+                .andExpect(jsonPath("$[0].saldo").value("1000"))
+                .andExpect(jsonPath("$[1].saldo").value("2000"))
+                .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(content().json(objectMapper.writeValueAsString(contas)))
+        ;
+
+    }
 }

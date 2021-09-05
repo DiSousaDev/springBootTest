@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Service
 public class ContaServiceImpl implements ContaService {
@@ -56,6 +57,16 @@ public class ContaServiceImpl implements ContaService {
 
         adicionarTransferencia(bancoId);
 
+    }
+
+    @Override
+    public List<Conta> buscarTodas(){
+        return null;
+    }
+
+    @Override
+    public Conta salvar(Conta conta){
+        return null;
     }
 
     private void adicionarTransferencia(Long bancoId) {
