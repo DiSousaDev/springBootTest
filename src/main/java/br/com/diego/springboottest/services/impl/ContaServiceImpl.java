@@ -61,7 +61,7 @@ public class ContaServiceImpl implements ContaService {
 
     @Override
     public List<Conta> buscarTodas(){
-        return null;
+        return contaRepository.findAll();
     }
 
     @Override

@@ -14,6 +14,8 @@ import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
 
 import static br.com.diego.springboottest.Dados.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -123,7 +125,23 @@ class SpringBootTestApplicationTests {
         assertEquals("Carlos Silva", conta2.getCliente());
 
         verify(contaRepository, times(2)).findById(1L);
-
     }
 
+    @Test
+    void contextLoads4(){
+        // Given
+        List<Conta> dados = Arrays.asList(conta001().orElseThrow(), conta002().orElseThrow());
+        when(contaRepository.findAll()).thenReturn(dados);
+
+        // When
+        List<Conta> contas = service.buscarTodas();
+
+        // Then
+        assertFalse(contas.isEmpty());
+        assertEquals(2, contas.size());
+        assertTrue(contas.contains(conta001().orElseThrow()));
+
+        verify(contaRepository).findAll();
+
+    }
 }
