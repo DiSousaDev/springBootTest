@@ -60,13 +60,15 @@ public class ContaServiceImpl implements ContaService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Conta> buscarTodas(){
         return contaRepository.findAll();
     }
 
     @Override
+    @Transactional
     public Conta salvar(Conta conta){
-        return null;
+        return contaRepository.save(conta);
     }
 
     private void adicionarTransferencia(Long bancoId) {

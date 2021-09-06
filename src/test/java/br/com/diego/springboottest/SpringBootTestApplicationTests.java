@@ -144,4 +144,28 @@ class SpringBootTestApplicationTests {
         verify(contaRepository).findAll();
 
     }
+
+    @Test
+    void contextLoads5(){
+        // Given
+        Conta novaConta = new Conta(null, "João", new BigDecimal("3000"));
+        when(contaRepository.save(any())).then(invocation -> {
+            Conta c = invocation.getArgument(0);
+            c.setId(3L);
+            return c;
+        });
+
+        // When
+        Conta conta = service.salvar(novaConta);
+
+        // Then
+        assertEquals("João", conta.getCliente());
+        assertEquals(3, conta.getId());
+        assertEquals("3000", conta.getSaldo().toPlainString());
+
+        verify(contaRepository).save(any());
+
+
+
+    }
 }
