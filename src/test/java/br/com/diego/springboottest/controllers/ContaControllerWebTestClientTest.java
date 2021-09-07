@@ -1,11 +1,15 @@
 package br.com.diego.springboottest.controllers;
 
+import br.com.diego.springboottest.models.Conta;
 import br.com.diego.springboottest.models.TransacaoDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -17,10 +21,11 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 class ContaControllerWebTestClientTest {
 
@@ -35,6 +40,7 @@ class ContaControllerWebTestClientTest {
     }
 
     @Test
+    @Order(1)
     void testTransferir() throws JsonProcessingException {
         // Given
         TransacaoDto dto = new TransacaoDto();
@@ -56,6 +62,7 @@ class ContaControllerWebTestClientTest {
                 .exchange()
         // Then
                 .expectStatus().isOk()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
                 .expectBody()
                 .consumeWith(resposta -> {
                     try {
@@ -75,5 +82,39 @@ class ContaControllerWebTestClientTest {
                 .jsonPath("$.transacao.contaOrigemId").isEqualTo(dto.getContaOrigemId())
                 .jsonPath("$.data").isEqualTo(LocalDate.now().toString())
                 .json(objectMapper.writeValueAsString(responseBody));
+    }
+
+    @Test
+    @Order(2)
+    void testDetalhe() throws JsonProcessingException{
+
+        // Given
+        Conta conta = new Conta(1L, "Carlos Silva", new BigDecimal("900"));
+
+        // When
+        webTestClient.get().uri("/api/contas/1").exchange()
+        // Then
+                .expectStatus().isOk()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBody()
+                .jsonPath("$.cliente").isEqualTo("Carlos Silva")
+                .jsonPath("$.saldo").isEqualTo(900)
+                .json(objectMapper.writeValueAsString(conta));
+    }
+
+    @Test
+    @Order(3)
+    void testDetalhe2(){
+        // When
+        webTestClient.get().uri("/api/contas/2").exchange()
+                // Then
+                .expectStatus().isOk()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBody(Conta.class)
+                .consumeWith(response -> {
+                    Conta conta = response.getResponseBody();
+                    assertEquals("Maria Rita", conta.getCliente());
+                    assertEquals("2100.00", conta.getSaldo().toPlainString());
+                });
     }
 }
