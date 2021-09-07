@@ -2,6 +2,7 @@ package br.com.diego.springboottest.controllers;
 
 import br.com.diego.springboottest.models.TransacaoDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -48,12 +50,24 @@ class ContaControllerWebTestClientTest {
         responseBody.put("transacao", dto);
 
         // When
-        webTestClient.post().uri("http://localhost:8080/api/contas/transferir")
+        webTestClient.post().uri("/api/contas/transferir")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(dto)
                 .exchange()
+        // Then
                 .expectStatus().isOk()
                 .expectBody()
+                .consumeWith(resposta -> {
+                    try {
+                        JsonNode json = objectMapper.readTree(resposta.getResponseBody());
+                        assertEquals("Transferência realizada com sucesso!", json.path("mensagem").asText());
+                        assertEquals(1, json.path("transacao").path("contaOrigemId").asLong());
+                        assertEquals(LocalDate.now().toString(), json.path("data").asText());
+                        assertEquals("100", json.path("transacao").path("valor").asText());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                })
                 .jsonPath("$.mensagem").isNotEmpty()
                 .jsonPath("$.mensagem").value(is("Transferência realizada com sucesso!"))
                 .jsonPath("$.mensagem").value( valor -> assertEquals("Transferência realizada com sucesso!", valor))
