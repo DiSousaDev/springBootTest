@@ -18,12 +18,23 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import static br.com.diego.springboottest.Dados.conta001;
+import static br.com.diego.springboottest.Dados.conta002;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @SpringBootTest(webEnvironment = RANDOM_PORT)
@@ -40,7 +51,7 @@ class ContaControllerWebTestClientTest {
     }
 
     @Test
-    @Order(1)
+    @Order(2)
     void testTransferir() throws JsonProcessingException {
         // Given
         TransacaoDto dto = new TransacaoDto();
@@ -85,7 +96,7 @@ class ContaControllerWebTestClientTest {
     }
 
     @Test
-    @Order(2)
+    @Order(3)
     void testDetalhe() throws JsonProcessingException{
 
         // Given
@@ -103,7 +114,7 @@ class ContaControllerWebTestClientTest {
     }
 
     @Test
-    @Order(3)
+    @Order(4)
     void testDetalhe2(){
         // When
         webTestClient.get().uri("/api/contas/2").exchange()
@@ -117,4 +128,27 @@ class ContaControllerWebTestClientTest {
                     assertEquals("2100.00", conta.getSaldo().toPlainString());
                 });
     }
+
+    @Test
+    @Order(1)
+    void testListarTodas() throws JsonProcessingException{
+        // Given
+        List<Conta> contas = Arrays.asList(conta001().orElseThrow(), conta002().orElseThrow());
+
+        // When
+        webTestClient.get().uri("/api/contas").exchange()
+        // Then
+                .expectStatus().isOk()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBody()
+                .jsonPath("$[0].cliente").isEqualTo("Carlos Silva")
+                .jsonPath("$[0].saldo").isEqualTo(1000)
+                .jsonPath("$[1].cliente").isEqualTo("Maria Rita")
+                .jsonPath("$[1].saldo").isEqualTo(2000)
+                .json(objectMapper.writeValueAsString(contas))
+                .jsonPath("$", hasSize(2));
+
+    }
+
+
 }
