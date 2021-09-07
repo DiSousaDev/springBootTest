@@ -3,10 +3,7 @@ package br.com.diego.springboottest.controllers;
 import br.com.diego.springboottest.models.Conta;
 import br.com.diego.springboottest.models.TransacaoDto;
 import br.com.diego.springboottest.services.ContaService;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.hamcrest.Matchers;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,11 +19,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.mockito.Mockito.*;
-import static br.com.diego.springboottest.Dados.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static br.com.diego.springboottest.Dados.conta001;
+import static br.com.diego.springboottest.Dados.conta002;
+import static br.com.diego.springboottest.Dados.getTransacaoDtoMock;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(ContaController.class)
 class ContaControllerTest {
