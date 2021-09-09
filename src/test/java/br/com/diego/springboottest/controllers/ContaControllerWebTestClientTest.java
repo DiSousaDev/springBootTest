@@ -28,6 +28,7 @@ import static br.com.diego.springboottest.Dados.conta002;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
@@ -51,7 +52,7 @@ class ContaControllerWebTestClientTest {
     }
 
     @Test
-    @Order(2)
+    @Order(1)
     void testTransferir() throws JsonProcessingException {
         // Given
         TransacaoDto dto = new TransacaoDto();
@@ -96,7 +97,7 @@ class ContaControllerWebTestClientTest {
     }
 
     @Test
-    @Order(3)
+    @Order(2)
     void testDetalhe() throws JsonProcessingException{
 
         // Given
@@ -114,7 +115,7 @@ class ContaControllerWebTestClientTest {
     }
 
     @Test
-    @Order(4)
+    @Order(3)
     void testDetalhe2(){
         // When
         webTestClient.get().uri("/api/contas/2").exchange()
@@ -130,10 +131,8 @@ class ContaControllerWebTestClientTest {
     }
 
     @Test
-    @Order(1)
-    void testListarTodas() throws JsonProcessingException{
-        // Given
-        List<Conta> contas = Arrays.asList(conta001().orElseThrow(), conta002().orElseThrow());
+    @Order(4)
+    void testListarTodas() {
 
         // When
         webTestClient.get().uri("/api/contas").exchange()
@@ -142,11 +141,41 @@ class ContaControllerWebTestClientTest {
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
                 .expectBody()
                 .jsonPath("$[0].cliente").isEqualTo("Carlos Silva")
-                .jsonPath("$[0].saldo").isEqualTo(1000)
+                .jsonPath("$[0].id").isEqualTo(1)
+                .jsonPath("$[0].saldo").isEqualTo(900)
                 .jsonPath("$[1].cliente").isEqualTo("Maria Rita")
-                .jsonPath("$[1].saldo").isEqualTo(2000)
-                .json(objectMapper.writeValueAsString(contas))
-                .jsonPath("$", hasSize(2));
+                .jsonPath("$[1].id").isEqualTo(2)
+                .jsonPath("$[1].saldo").isEqualTo(2100)
+                .jsonPath("$").isArray()
+                .jsonPath("$").value(hasSize(2));
+
+    }
+
+    @Test
+    @Order(5)
+    void testListarTodas2() {
+        // Given
+        List<Conta> contasMock = Arrays.asList(conta001().orElseThrow(), conta002().orElseThrow());
+
+        // When
+        webTestClient.get().uri("/api/contas").exchange()
+                // Then
+                .expectStatus().isOk()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBodyList(Conta.class)
+                .consumeWith(response -> {
+                    List<Conta> contas = response.getResponseBody();
+                    assertNotNull(contas);
+                    assertEquals(2, contas.size());
+                    assertEquals(1L, contas.get(0).getId());
+                    assertEquals("Carlos Silva", contas.get(0).getCliente());
+                    assertEquals("900.0", contas.get(0).getSaldo().toPlainString());
+                    assertEquals(2L, contas.get(1).getId());
+                    assertEquals("Maria Rita", contas.get(1).getCliente());
+                    assertEquals("2100.0", contas.get(1).getSaldo().toPlainString());
+                })
+                .hasSize(2)// BodyList
+                .value(hasSize(2)); // hamcrest
 
     }
 
