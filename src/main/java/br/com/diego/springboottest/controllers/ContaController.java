@@ -5,6 +5,7 @@ import br.com.diego.springboottest.models.TransacaoDto;
 import br.com.diego.springboottest.services.ContaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,8 +18,10 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 
 @RestController
@@ -42,8 +45,14 @@ public class ContaController {
 
     @GetMapping("/{id}")
     @ResponseStatus(OK)
-    public Conta detalhe(@PathVariable Long id){
-        return contaService.buscarPorId(id);
+    public ResponseEntity<?> detalhe(@PathVariable Long id){
+        Conta conta;
+        try {
+            conta = contaService.buscarPorId(id);
+        } catch (NoSuchElementException error) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(conta);
     }
 
     @PostMapping("/transferir")
@@ -57,6 +66,12 @@ public class ContaController {
         responseBody.put("transacao", dto);
 
         return ResponseEntity.ok(responseBody);
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(NO_CONTENT)
+    public void excluir (@PathVariable Long id) {
+        contaService.excluir(id);
     }
 
 }

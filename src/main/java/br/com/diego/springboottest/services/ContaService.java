@@ -19,4 +19,6 @@ public interface ContaService {
 
     Conta salvar(Conta conta);
 
+    void excluir(Long id);
+
 }

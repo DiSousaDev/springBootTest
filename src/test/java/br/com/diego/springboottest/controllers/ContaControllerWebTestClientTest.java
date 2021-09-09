@@ -184,7 +184,7 @@ class ContaControllerWebTestClientTest {
 
     @Test
     @Order(6)
-    void testSalvar() throws Exception {
+    void testSalvar() {
         // Given
         Conta conta = new Conta(null, "João", new BigDecimal("3000"));
 
@@ -206,7 +206,7 @@ class ContaControllerWebTestClientTest {
 
     @Test
     @Order(7)
-    void testSalvar2() throws Exception {
+    void testSalvar2() {
         // Given
         Conta conta = new Conta(null, "Maria", new BigDecimal("3123"));
 
@@ -229,5 +229,33 @@ class ContaControllerWebTestClientTest {
 
     }
 
+    @Test
+    @Order(8)
+    void testExcluir(){
+
+        webTestClient.get().uri("/api/contas").exchange()
+                .expectStatus()
+                .isOk()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBodyList(Conta.class)
+                .hasSize(4);
+
+        webTestClient.delete().uri("/api/contas/3")
+                .exchange()
+                .expectStatus().isNoContent()
+                .expectBody().isEmpty();
+
+        webTestClient.get().uri("/api/contas").exchange()
+                .expectStatus()
+                .isOk()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBodyList(Conta.class)
+                .hasSize(3);
+
+        webTestClient.get().uri("/api/contas/3").exchange()
+//                .expectStatus().is5xxServerError();
+                .expectStatus().isNotFound()
+                .expectBody().isEmpty();
+    }
 
 }

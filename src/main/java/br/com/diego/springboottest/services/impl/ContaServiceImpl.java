@@ -71,6 +71,12 @@ public class ContaServiceImpl implements ContaService {
         return contaRepository.save(conta);
     }
 
+    @Override
+    @Transactional
+    public void excluir(Long id){
+        contaRepository.deleteById(id);
+    }
+
     private void adicionarTransferencia(Long bancoId) {
         Banco banco = bancoRepository.findById(bancoId).orElseThrow();
         int totalTransferencias = banco.getTotalTransferencias();
