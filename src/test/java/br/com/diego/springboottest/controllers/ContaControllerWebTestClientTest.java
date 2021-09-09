@@ -29,10 +29,12 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -125,6 +127,7 @@ class ContaControllerWebTestClientTest {
                 .expectBody(Conta.class)
                 .consumeWith(response -> {
                     Conta conta = response.getResponseBody();
+                    assertNotNull(conta);
                     assertEquals("Maria Rita", conta.getCliente());
                     assertEquals("2100.00", conta.getSaldo().toPlainString());
                 });
@@ -176,6 +179,53 @@ class ContaControllerWebTestClientTest {
                 })
                 .hasSize(2)// BodyList
                 .value(hasSize(2)); // hamcrest
+
+    }
+
+    @Test
+    @Order(6)
+    void testSalvar() throws Exception {
+        // Given
+        Conta conta = new Conta(null, "João", new BigDecimal("3000"));
+
+        // When
+        webTestClient.post().uri("/api/contas")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(conta)
+                .exchange()
+        // Then
+                .expectStatus().isCreated()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBody()
+                .jsonPath("$.id").isEqualTo(3)
+                .jsonPath("$.cliente").isEqualTo("João")
+                .jsonPath("$.cliente").value(is("João"))
+                .jsonPath("$.saldo").isEqualTo(3000);
+
+    }
+
+    @Test
+    @Order(7)
+    void testSalvar2() throws Exception {
+        // Given
+        Conta conta = new Conta(null, "Maria", new BigDecimal("3123"));
+
+        // When
+        webTestClient.post().uri("/api/contas")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(conta)
+                .exchange()
+                // Then
+                .expectStatus().isCreated()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBody(Conta.class)
+                .consumeWith(response -> {
+                    Conta c = response.getResponseBody();
+                    assertNotNull(c);
+                    assertEquals(4L, c.getId());
+                    assertEquals("Maria", c.getCliente());
+                    assertEquals("3123", c.getSaldo().toPlainString());
+                });
 
     }
 
