@@ -110,7 +110,6 @@ class ContaControllerTestRestTemplateTest {
 
     }
 
-
     @Test
     @Order(3)
     void testListarTodas() throws JsonProcessingException{
@@ -136,6 +135,26 @@ class ContaControllerTestRestTemplateTest {
         assertEquals(2, jsonNode.get(1).path("id").asLong());
         assertEquals("Maria Rita", jsonNode.get(1).path("cliente").asText());
         assertEquals("2100.0", jsonNode.get(1).path("saldo").asText());
+
+    }
+
+    @Test
+    @Order(4)
+    void salvar(){
+        Conta conta = new Conta(null, "Pedro", new BigDecimal("3800.00"));
+
+        ResponseEntity<Conta> response = testRestTemplateclient.postForEntity(getUri("/api/contas"), conta, Conta.class);
+
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertEquals(MediaType.APPLICATION_JSON, response.getHeaders().getContentType());
+
+        Conta contaNova = response.getBody();
+
+        assertNotNull(contaNova);
+        assertEquals(3L, contaNova.getId());
+        assertEquals("Pedro", contaNova.getCliente());
+        assertEquals("3800.00", contaNova.getSaldo().toPlainString());
+
     }
 
     private String getUri(String uri) {
