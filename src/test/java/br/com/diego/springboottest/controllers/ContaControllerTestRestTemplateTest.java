@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -140,7 +141,7 @@ class ContaControllerTestRestTemplateTest {
 
     @Test
     @Order(4)
-    void salvar(){
+    void testSalvar(){
         Conta conta = new Conta(null, "Pedro", new BigDecimal("3800.00"));
 
         ResponseEntity<Conta> response = testRestTemplateclient.postForEntity(getUri("/api/contas"), conta, Conta.class);
@@ -154,6 +155,33 @@ class ContaControllerTestRestTemplateTest {
         assertEquals(3L, contaNova.getId());
         assertEquals("Pedro", contaNova.getCliente());
         assertEquals("3800.00", contaNova.getSaldo().toPlainString());
+
+    }
+
+    @Test
+    @Order(5)
+    void testDeletar() {
+
+        ResponseEntity<Conta[]> response = testRestTemplateclient.getForEntity(getUri("/api/contas"), Conta[].class);
+        List<Conta> contas = Arrays.asList(response.getBody());
+        assertNotNull(contas);
+        assertEquals(3, contas.size());
+
+        // testRestTemplateclient.delete(getUri("/api/contas/3"));
+        Map<String, Long> pathVariables = new HashMap<>();
+        pathVariables.put("id", 3L);
+        ResponseEntity<Void> exchange = testRestTemplateclient.exchange(getUri("/api/contas/{id}"), HttpMethod.DELETE, null, Void.class, pathVariables);
+        assertEquals(HttpStatus.NO_CONTENT, exchange.getStatusCode());
+        assertFalse(exchange.hasBody());
+
+        response = testRestTemplateclient.getForEntity(getUri("/api/contas"), Conta[].class);
+        contas = Arrays.asList(response.getBody());
+        assertNotNull(contas);
+        assertEquals(2, contas.size());
+
+        ResponseEntity<Conta> responseDetalhar = testRestTemplateclient.getForEntity(getUri("/api/contas/3"), Conta.class);
+        assertEquals(HttpStatus.NOT_FOUND, responseDetalhar.getStatusCode());
+        assertFalse(responseDetalhar.hasBody());
 
     }
 
