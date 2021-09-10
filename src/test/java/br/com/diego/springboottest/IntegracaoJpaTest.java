@@ -2,6 +2,7 @@ package br.com.diego.springboottest;
 
 import br.com.diego.springboottest.models.Conta;
 import br.com.diego.springboottest.repositories.ContaRepository;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -16,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@Tag("integracao_jpa")
 @DataJpaTest
 public class IntegracaoJpaTest {
 
