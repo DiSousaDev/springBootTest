@@ -1,5 +1,6 @@
 package br.com.diego.springboottest.controllers;
 
+import br.com.diego.springboottest.models.Conta;
 import br.com.diego.springboottest.models.TransacaoDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -43,7 +44,7 @@ class ContaControllerTestRestTemplateTest {
 
     @Test
     @Order(1)
-    void listarTodas() throws JsonProcessingException{
+    void transferir() throws JsonProcessingException{
         TransacaoDto dto = new TransacaoDto();
         dto.setValor(new BigDecimal("100"));
         dto.setContaOrigemId(1L);
@@ -80,6 +81,28 @@ class ContaControllerTestRestTemplateTest {
 
         // Testando objeto retorno
         assertEquals(objectMapper.writeValueAsString(responseBody), json);
+
+    }
+
+    @Test
+    @Order(2)
+    void testDetalhe() throws JsonProcessingException{
+
+        ResponseEntity<Conta> response = testRestTemplateclient.getForEntity(getUri("/api/contas/1"), Conta.class);
+        Conta conta = response.getBody();
+
+        // Given
+        Conta contaTeste = new Conta(1L, "Carlos Silva", new BigDecimal("900.00"));
+
+        // When
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(MediaType.APPLICATION_JSON, response.getHeaders().getContentType());
+        assertNotNull(conta);
+        assertEquals(1L, conta.getId());
+        assertEquals("Carlos Silva", conta.getCliente());
+        assertEquals("900.00", conta.getSaldo().toPlainString());
+
+        assertEquals(conta, contaTeste);
 
     }
 
